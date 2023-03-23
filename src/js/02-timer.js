@@ -17,11 +17,11 @@ const options = {
   defaultDate: new Date(),
   minuteIncrement: 1,
   onClose(selectedDates) {
-    let cleanInterval;
+    let intervalID;
     if (options.defaultDate <= selectedDates[0]) {
       btnStart.removeAttribute('disabled');
       btnStart.addEventListener('click', () => {
-      clearInterval(cleanInterval);
+      clearInterval(intervalID);
         time.start();
         btnStart.setAttribute('disabled', 'disabled');
       });
@@ -32,7 +32,7 @@ const options = {
     const time = {
       start() {
         const startTime = Date.now();
-        cleanInterval = setInterval(() => {
+        intervalID = setInterval(() => {
           const currentTime = Date.now();
           const deltaTime = selectedDates[0] - currentTime;
           if (deltaTime < 0) {

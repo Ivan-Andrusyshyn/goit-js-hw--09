@@ -1,48 +1,43 @@
 import Notiflix from 'notiflix';
-const form = document.querySelector('.form');
 
+const form = document.querySelector('.form');
 const inputAmount = document.querySelector('[name="amount"]');
 const inputStep = document.querySelector('[name="step"]');
 const inputDelay = document.querySelector('[name="delay"]');
 
-let count = 0;
-let interval = 0;
+form.addEventListener('submit', submitCreatePromise);
 
-form.addEventListener('submit', makePromisesOnClick);
-function makePromisesOnClick(ev) {
+function submitCreatePromise(ev) {
   ev.preventDefault();
 
-  interval = Number(inputDelay.value);
+  let delay = Number(inputDelay.value);
+  const delayStep = Number(inputStep.value);
+  const amount = inputAmount.value;
 
-  const maker = interval => {
-    if (count < inputAmount.value) {
-      count += 1;
-      promisMake(inputDelay, inputStep, count, interval);
-    } else {
-      return clearInterval(timerId);
-    }
-  };
-  const timerId = setInterval(maker, interval);
+  for (let position = 1; position <= amount; position++) {
+    createPromise(position, delay)
+      .then(({ position, delay }) => {
+        Notiflix.Notify.success(
+          `✅ Fulfilled promise ${position} in ${delay}ms`
+        );
+      })
+      .catch(({ position, delay }) => {
+        Notiflix.Notify.failure(
+          `❌ Rejected promise ${position} in ${delay}ms`
+        );
+      });
+    delay += delayStep;
+  }
 }
-// let  msDelay = Number(inputDelay.value);
-function promisMake(inputDelay, inputStep, count) {
-  const promis = new Promise((resolve, reject) => {
-    const shouldResolve = Math.random() > 0.3;
-    if (shouldResolve) {
-      resolve();
-    } else {
-      reject();
-    }
+function createPromise(position, delay) {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      const shouldResolve = Math.random() > 0.3;
+      if (shouldResolve) {
+        resolve({ position, delay });
+      } else {
+        reject({ position, delay });
+      }
+    }, delay);
   });
-  promis
-    .then(() => {
-      // msDelay += Number(inputStep.value);
-      Notiflix.Notify.success(`✅ Fulfilled promise ${count} in ${interval}ms`);
-      interval += Number(inputStep.value);
-    })
-    .catch(() => {
-      // msDelay += Number(inputStep.value);
-      Notiflix.Notify.failure(`❌ Rejected promise ${count} in ${interval}ms`);
-      interval += Number(inputStep.value);
-    });
 }
